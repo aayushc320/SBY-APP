@@ -12,6 +12,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const errorHandler = require('./middleware/error');
 const path = require('path');
 const connectDB = require('./config/db');
+const fs = require('fs');
 
 // Load environment variables
 dotenv.config({ path: './.env' });
@@ -82,11 +83,36 @@ app.use('/api/mongodb', mongodbRoutes);
 
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
-  // Set static folder
-  app.use(express.static('client/build'));
+  // Set static folder - look for files in multiple possible locations
+  const possiblePaths = [
+    path.join(__dirname, '../ui/build'),      // If UI is built in ui/build
+    path.join(__dirname, 'client/build'),     // If UI is copied to server/client/build
+    path.join(__dirname, '../client/build'),  // Another possible location
+    path.join(__dirname, 'public')            // Default public folder
+  ];
+  
+  // Log where we're looking for static files
+  console.log('Checking for static files in these locations:');
+  possiblePaths.forEach(p => {
+    const exists = fs.existsSync(p);
+    console.log(`- ${p} (${exists ? 'EXISTS' : 'NOT FOUND'})`);
+    if (exists) {
+      app.use(express.static(p));
+    }
+  });
 
+  // Serve index.html for any route not found
   app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+    // Try to find index.html in any of the possible paths
+    for (const p of possiblePaths) {
+      const indexPath = path.join(p, 'index.html');
+      if (fs.existsSync(indexPath)) {
+        return res.sendFile(indexPath);
+      }
+    }
+    
+    // If we can't find index.html, serve an error message
+    res.status(404).send('Frontend files not found. Please check build configuration.');
   });
 }
 

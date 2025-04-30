@@ -6,7 +6,8 @@
   "scripts": {
     "start": "cd server && npm start",
     "build": "cd ui && npm install && npm run build",
-    "deploy": "cd server && npm install"
+    "deploy": "cd server && npm install && mkdir -p client && cp -r ../ui/build client/ || true",
+    "postbuild": "mkdir -p server/client && cp -r ui/build server/client/ || echo 'Copy failed, continuing anyway'"
   },
   "engines": {
     "node": ">=16.0.0"
