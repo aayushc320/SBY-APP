@@ -852,111 +852,115 @@ const getCapacityColor = (enrolled, capacity) => {
   return 'bg-green-500';
 };
 
+// Mock data for testing
+const mockClassesData = [
+  {
+    id: 1,
+    title: 'Morning Vinyasa Flow',
+    description: 'Start your day with an energizing Vinyasa flow that will awaken your body and mind. Suitable for all levels.',
+    instructor: 'Sarah Johnson',
+    instructorAvatar: 'https://randomuser.me/api/portraits/women/44.jpg',
+    date: '2023-07-15',
+    startTime: '08:00',
+    endTime: '09:00',
+    duration: 60,
+    capacity: 20,
+    enrolled: 15,
+    category: 'Vinyasa',
+    credits: 1,
+    location: 'Studio A',
+    isOnline: false,
+    isRecurring: true,
+    recurringPattern: 'weekly'
+  },
+  {
+    id: 2,
+    title: 'Gentle Hatha Yoga',
+    description: 'A slow-paced class focused on breathing and gentle stretching. Perfect for beginners or those recovering from injury.',
+    instructor: 'Michael Chen',
+    instructorAvatar: 'https://randomuser.me/api/portraits/men/42.jpg',
+    date: '2023-07-16',
+    startTime: '10:00',
+    endTime: '11:00',
+    duration: 60,
+    capacity: 15,
+    enrolled: 8,
+    category: 'Hatha',
+    credits: 1,
+    location: 'Studio B',
+    isOnline: false,
+    isRecurring: false
+  },
+  {
+    id: 3,
+    title: 'Power Yoga',
+    description: 'Challenging class that builds strength, flexibility and endurance. Previous yoga experience recommended.',
+    instructor: 'Emma Wilson',
+    instructorAvatar: 'https://randomuser.me/api/portraits/women/65.jpg',
+    date: '2023-07-17',
+    startTime: '17:30',
+    endTime: '18:30',
+    duration: 60,
+    capacity: 20,
+    enrolled: 20,
+    category: 'Power',
+    credits: 2,
+    location: 'Studio A',
+    isOnline: false,
+    isRecurring: true,
+    recurringPattern: 'weekly'
+  },
+  {
+    id: 4,
+    title: 'Online Meditation',
+    description: 'Guided meditation session to reduce stress and improve mental clarity. No experience needed.',
+    instructor: 'John Smith',
+    instructorAvatar: 'https://randomuser.me/api/portraits/men/67.jpg',
+    date: '2023-07-18',
+    startTime: '19:00',
+    endTime: '20:00',
+    duration: 60,
+    capacity: 30,
+    enrolled: 12,
+    category: 'Meditation',
+    credits: 1,
+    zoomLink: 'https://zoom.us/j/123456789',
+    isOnline: true,
+    isRecurring: false
+  },
+  {
+    id: 5,
+    title: 'Yin Yoga',
+    description: 'Deep stretching practice where poses are held for longer periods. Promotes flexibility and relaxation.',
+    instructor: 'Sarah Johnson',
+    instructorAvatar: 'https://randomuser.me/api/portraits/women/44.jpg',
+    date: '2023-07-19',
+    startTime: '16:00',
+    endTime: '17:30',
+    duration: 90,
+    capacity: 15,
+    enrolled: 10,
+    category: 'Yin',
+    credits: 2,
+    location: 'Studio B',
+    isOnline: false,
+    isRecurring: true,
+    recurringPattern: 'biweekly'
+  }
+];
+
+const mockInstructorsData = [
+  { id: 1, name: 'Sarah Johnson', role: 'instructor' },
+  { id: 2, name: 'Michael Chen', role: 'instructor' },
+  { id: 3, name: 'Emma Wilson', role: 'instructor' },
+  { id: 4, name: 'John Smith', role: 'instructor' }
+];
+
 const ClassManagement = () => {
-  // Mock data for demonstration
-  const [classes, setClasses] = useState([
-    {
-      id: 1,
-      title: 'Morning Vinyasa Flow',
-      description: 'Start your day with an energizing Vinyasa flow that will awaken your body and mind. Suitable for all levels.',
-      instructor: 'Sarah Johnson',
-      instructorAvatar: 'https://randomuser.me/api/portraits/women/44.jpg',
-      date: '2023-07-15',
-      startTime: '08:00',
-      endTime: '09:00',
-      duration: 60,
-      capacity: 20,
-      enrolled: 15,
-      category: 'Vinyasa',
-      credits: 1,
-      location: 'Studio A',
-      isOnline: false,
-      isRecurring: true,
-      recurringPattern: 'weekly'
-    },
-    {
-      id: 2,
-      title: 'Gentle Hatha Yoga',
-      description: 'A slow-paced class focused on breathing and gentle stretching. Perfect for beginners or those recovering from injury.',
-      instructor: 'Michael Chen',
-      instructorAvatar: 'https://randomuser.me/api/portraits/men/42.jpg',
-      date: '2023-07-16',
-      startTime: '10:00',
-      endTime: '11:00',
-      duration: 60,
-      capacity: 15,
-      enrolled: 8,
-      category: 'Hatha',
-      credits: 1,
-      location: 'Studio B',
-      isOnline: false,
-      isRecurring: false
-    },
-    {
-      id: 3,
-      title: 'Power Yoga',
-      description: 'Challenging class that builds strength, flexibility and endurance. Previous yoga experience recommended.',
-      instructor: 'Emma Wilson',
-      instructorAvatar: 'https://randomuser.me/api/portraits/women/65.jpg',
-      date: '2023-07-17',
-      startTime: '17:30',
-      endTime: '18:30',
-      duration: 60,
-      capacity: 20,
-      enrolled: 20,
-      category: 'Power',
-      credits: 2,
-      location: 'Studio A',
-      isOnline: false,
-      isRecurring: true,
-      recurringPattern: 'weekly'
-    },
-    {
-      id: 4,
-      title: 'Online Meditation',
-      description: 'Guided meditation session to reduce stress and improve mental clarity. No experience needed.',
-      instructor: 'John Smith',
-      instructorAvatar: 'https://randomuser.me/api/portraits/men/67.jpg',
-      date: '2023-07-18',
-      startTime: '19:00',
-      endTime: '20:00',
-      duration: 60,
-      capacity: 30,
-      enrolled: 12,
-      category: 'Meditation',
-      credits: 1,
-      zoomLink: 'https://zoom.us/j/123456789',
-      isOnline: true,
-      isRecurring: false
-    },
-    {
-      id: 5,
-      title: 'Yin Yoga',
-      description: 'Deep stretching practice where poses are held for longer periods. Promotes flexibility and relaxation.',
-      instructor: 'Sarah Johnson',
-      instructorAvatar: 'https://randomuser.me/api/portraits/women/44.jpg',
-      date: '2023-07-19',
-      startTime: '16:00',
-      endTime: '17:30',
-      duration: 90,
-      capacity: 15,
-      enrolled: 10,
-      category: 'Yin',
-      credits: 2,
-      location: 'Studio B',
-      isOnline: false,
-      isRecurring: true,
-      recurringPattern: 'biweekly'
-    }
-  ]);
-
-  const [instructors, setInstructors] = useState([
-    { id: 1, name: 'Sarah Johnson', role: 'instructor' },
-    { id: 2, name: 'Michael Chen', role: 'instructor' },
-    { id: 3, name: 'Emma Wilson', role: 'instructor' },
-    { id: 4, name: 'John Smith', role: 'instructor' }
-  ]);
-
+  const [classes, setClasses] = useState([]);
+  const [instructors, setInstructors] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
   // State for modals
   const [classModalOpen, setClassModalOpen] = useState(false);
   const [detailsModalOpen, setDetailsModalOpen] = useState(false);
@@ -993,28 +997,32 @@ const ClassManagement = () => {
 
   // In a real app, you would fetch data from your API here
   useEffect(() => {
-    // Mock API fetch
     const fetchData = async () => {
+      // In a real app, these would be API calls
       try {
         // const response = await axios.get('/api/admin/classes');
         // setClasses(response.data);
         
-        // For demo, we're using the mock data already set in state
-        console.log('Class data would be fetched here in a real app');
+        // For demo, we're using mock data
+        setTimeout(() => {
+          setClasses(mockClassesData);
+          setIsLoading(false);
+        }, 800);
       } catch (error) {
-        console.error('Error fetching classes:', error);
+        console.error('Error fetching classes data:', error);
+        setIsLoading(false);
       }
     };
-
+    
     const fetchInstructors = async () => {
       try {
+        // In a real app, this would be an API call
         // const response = await axios.get('/api/admin/instructors');
-        // setInstructors(response.data);
-        
-        // For demo, we're using the mock data
-        console.log('Instructor data would be fetched here in a real app');
+        setInstructors(mockInstructorsData); // Use the setInstructors to avoid ESLint error
+        // setIsLoading(false);
       } catch (error) {
-        console.error('Error fetching instructors:', error);
+        console.error('Error fetching instructors data:', error);
+        // setIsLoading(false);
       }
     };
 
