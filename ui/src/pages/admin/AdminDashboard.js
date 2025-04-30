@@ -92,7 +92,7 @@ const RecentActivity = ({ activities }) => {
 
 const AdminDashboard = () => {
   // Mock data for demonstration
-  const [stats, setStats] = useState({
+  const [stats] = useState({
     totalUsers: '1,249',
     totalClasses: '84',
     activeSubscriptions: '756',

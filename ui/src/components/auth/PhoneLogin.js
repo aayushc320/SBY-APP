@@ -6,8 +6,7 @@ import { initializeApp } from 'firebase/app';
 import { 
   getAuth, 
   RecaptchaVerifier, 
-  signInWithPhoneNumber,
-  PhoneAuthProvider
+  signInWithPhoneNumber
 } from 'firebase/auth';
 
 // Firebase configuration

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
+// Commented out as it's only used in commented code blocks
+// import axios from 'axios';
 
 // Mock data for group classes
 const mockGroupClasses = [

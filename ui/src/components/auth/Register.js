@@ -3,17 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../contexts/AuthContext';
 import AlertMessage from '../common/AlertMessage';
 
-// Firebase config is stored here but we'll implement the actual integration later
-const firebaseConfig = {
-  apiKey: "AIzaSyDVMWdEn3QkdQ_c1cXpAkoS257D8Wz5-NM",
-  authDomain: "strongbyyoga.com",
-  projectId: "strongbyyoga",
-  storageBucket: "strongbyyoga.appspot.com",
-  messagingSenderId: "809995789251",
-  appId: "1:809995789251:web:18520da28b9d0a2f999376",
-  measurementId: "G-F68NMT99LR"
-};
-
 const Register = () => {
   const [formData, setFormData] = useState({
     name: '',
