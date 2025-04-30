@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 // Commented out as it's only used in commented code blocks
 // import axios from 'axios';
 
@@ -96,7 +96,7 @@ const OneonOneBooking = ({ setAlert, membershipInfo }) => {
   }, [setAlert]);
 
   // Fetch available times for the selected instructor and date
-  const fetchAvailableTimes = async () => {
+  const fetchAvailableTimes = useCallback(async () => {
     if (!selectedInstructor || !selectedDate) return;
 
     try {
@@ -123,14 +123,14 @@ const OneonOneBooking = ({ setAlert, membershipInfo }) => {
       });
       setLoading(false);
     }
-  };
+  }, [selectedInstructor, selectedDate, setAlert]);
 
   // When instructor or date changes, fetch available times
   useEffect(() => {
     if (selectedInstructor && selectedDate) {
       fetchAvailableTimes();
     }
-  }, [selectedInstructor, selectedDate]);
+  }, [selectedInstructor, selectedDate, fetchAvailableTimes]);
 
   const handleInstructorSelect = (instructor) => {
     setSelectedInstructor(instructor);

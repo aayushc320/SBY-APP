@@ -118,16 +118,16 @@ const Dashboard = () => {
         }, 1000);
       } catch (err) {
         console.error('Error fetching dashboard data:', err);
-        setDashboardData({
-          ...dashboardData,
+        setDashboardData(prevData => ({
+          ...prevData,
           loading: false,
           error: 'Failed to load dashboard data. Please try again later.'
-        });
+        }));
       }
     };
 
     fetchDashboardData();
-  }, []);
+  }, []); // Empty dependency array is appropriate here since we only want to fetch once on component mount
 
   if (dashboardData.loading) {
     return (
