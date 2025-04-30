@@ -13,8 +13,14 @@ const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 // Generate JWT Token
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN,
+  // Provide a default value of 30 days if JWT_EXPIRES_IN is missing or invalid
+  const expiresIn = process.env.JWT_EXPIRES_IN || '30d';
+  
+  // Use a default secret if JWT_SECRET is missing (not recommended for production)
+  const secret = process.env.JWT_SECRET || 'strongbyyogasecret123456789';
+  
+  return jwt.sign({ id }, secret, {
+    expiresIn: expiresIn,
   });
 };
 
