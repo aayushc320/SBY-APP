@@ -2,6 +2,6 @@
   base = "ui"
   publish = "build"
   command = "npm run build"
-
+ 
 [build.environment]
   NODE_VERSION = "18" 

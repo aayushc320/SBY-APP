@@ -182,12 +182,20 @@ const Navbar = () => {
                   >
                     Profile
                   </Link>
-                  {user && (user.role === 'instructor' || user.role === 'admin') && (
+                  {user && user.role === 'instructor' && (
                     <Link
                       to="/teaching"
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       My Classes
+                    </Link>
+                  )}
+                  {user && user.role === 'admin' && (
+                    <Link
+                      to="/admin"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Admin Dashboard
                     </Link>
                   )}
                   <button
