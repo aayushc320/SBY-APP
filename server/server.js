@@ -19,6 +19,9 @@ dotenv.config({ path: './.env' });
 // Connect to database
 connectDB();
 
+// Allow Render to set the port via environment variable
+const PORT = process.env.PORT || 5000;
+
 // Create Express app
 const app = express();
 
@@ -48,7 +51,12 @@ app.use(cookieParser());
 
 // Enable CORS
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
+  origin: [
+    'http://localhost:3000', 
+    'http://127.0.0.1:3000',
+    'https://benevolent-muffin-267336.netlify.app',
+    'https://*.netlify.app'  // Allow all Netlify subdomains
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -86,7 +94,6 @@ if (process.env.NODE_ENV === 'production') {
 app.use(errorHandler);
 
 // Start server
-const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

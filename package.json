@@ -1,0 +1,21 @@
+{
+  "name": "strongbyyoga",
+  "version": "1.0.0",
+  "description": "StrongByYoga Platform",
+  "main": "index.js",
+  "scripts": {
+    "start": "cd server && npm start",
+    "build": "cd ui && npm install && npm run build",
+    "deploy": "cd server && npm install"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "keywords": [
+    "yoga",
+    "fitness",
+    "platform"
+  ],
+  "author": "",
+  "license": "ISC"
+} 

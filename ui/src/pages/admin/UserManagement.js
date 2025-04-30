@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import api from '../../utils/api';
 import axios from 'axios';
+import config from '../../config';
 
 // User table component
 const UserTable = ({ users, onEdit, onDelete, onCredits, onChangeRole }) => {
@@ -654,8 +655,8 @@ const UserManagement = () => {
       try {
         setLoading(true);
         
-        // Use the MongoDB endpoint
-        const response = await axios.get('http://localhost:5000/api/mongodb/users');
+        // Use the MongoDB endpoint from config
+        const response = await axios.get(`${config.mongoDbUrl}/users`);
         
         // Log the full response for debugging
         console.log('MongoDB Response:', response);
@@ -715,7 +716,7 @@ const UserManagement = () => {
       if (currentUser) {
         // Edit existing user - use the MongoDB endpoint
         console.log('Updating user:', currentUser.id, userData);
-        await axios.put(`http://localhost:5000/api/mongodb/users/${currentUser.id}`, userData);
+        await axios.put(`${config.mongoDbUrl}/users/${currentUser.id}`, userData);
         
         // Update state
         setUsers(users.map(user => 
@@ -725,7 +726,7 @@ const UserManagement = () => {
       } else {
         // Add new user - use the MongoDB endpoint
         console.log('Adding new user:', userData);
-        const response = await axios.post('http://localhost:5000/api/mongodb/users', userData);
+        const response = await axios.post(`${config.mongoDbUrl}/users`, userData);
         
         // Update state with the newly created user
         const newUser = response.data;
@@ -755,7 +756,7 @@ const UserManagement = () => {
     try {
       // Delete user from the API using the MongoDB endpoint
       console.log('Deleting user:', userId);
-      await axios.delete(`http://localhost:5000/api/mongodb/users/${userId}`);
+      await axios.delete(`${config.mongoDbUrl}/users/${userId}`);
       
       // Update state
       const userToDelete = users.find(u => u.id === userId);
@@ -783,7 +784,7 @@ const UserManagement = () => {
       
       // Update user credits using the MongoDB endpoint
       console.log('Updating credits for user:', userId, 'New credits:', newCredits);
-      await axios.put(`http://localhost:5000/api/mongodb/users/${userId}/credits`, { credits: newCredits });
+      await axios.put(`${config.mongoDbUrl}/users/${userId}/credits`, { credits: newCredits });
       
       // Update state
       setUsers(users.map(user => {
@@ -810,7 +811,7 @@ const UserManagement = () => {
     try {
       // Update user role using the MongoDB endpoint
       console.log('Updating role for user:', userId, 'New role:', role);
-      await axios.put(`http://localhost:5000/api/mongodb/users/${userId}/role`, { role });
+      await axios.put(`${config.mongoDbUrl}/users/${userId}/role`, { role });
       
       // Update state
       const user = users.find(u => u.id === userId);
