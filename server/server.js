@@ -61,6 +61,7 @@ const classRoutes = require('./routes/classes');
 const paymentRoutes = require('./routes/payments');
 const zoomRoutes = require('./routes/zoom');
 const bookingRoutes = require('./routes/bookingRoutes');
+const mongodbRoutes = require('./routes/mongodb');
 
 // Use routes
 app.use('/api/auth', authRoutes);
@@ -69,6 +70,7 @@ app.use('/api/classes', classRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/zoom', zoomRoutes);
 app.use('/api/bookings', bookingRoutes);
+app.use('/api/mongodb', mongodbRoutes);
 
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {

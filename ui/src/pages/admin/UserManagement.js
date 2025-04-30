@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
+import api from '../../utils/api';
+import axios from 'axios';
 
 // User table component
 const UserTable = ({ users, onEdit, onDelete, onCredits, onChangeRole }) => {
@@ -601,60 +603,34 @@ const DeleteModal = ({ user, isOpen, onClose, onConfirm }) => {
   );
 };
 
+// Add this Alert component before the UserManagement component
+const Alert = ({ type, message, onClose }) => {
+  const bgColor = type === 'success' ? 'bg-green-100 border-green-400 text-green-700' : 'bg-red-100 border-red-400 text-red-700';
+  
+  return (
+    <div className={`${bgColor} px-4 py-3 rounded relative mb-4 border`} role="alert">
+      <strong className="font-bold mr-2">
+        {type === 'success' ? 'Success!' : 'Error!'}
+      </strong>
+      <span className="block sm:inline">{message}</span>
+      <button 
+        className="absolute top-0 bottom-0 right-0 px-4 py-3"
+        onClick={onClose}
+      >
+        <svg className="fill-current h-6 w-6" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+          <title>Close</title>
+          <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
+        </svg>
+      </button>
+    </div>
+  );
+};
+
 const UserManagement = () => {
-  // Mock data for demonstration
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      name: 'Sarah Johnson',
-      email: 'sarah@example.com',
-      role: 'instructor',
-      status: 'active',
-      credits: 0,
-      avatar: 'https://randomuser.me/api/portraits/women/44.jpg',
-      joinedDate: '2023-01-15'
-    },
-    {
-      id: 2, 
-      name: 'Michael Chen',
-      email: 'michael@example.com',
-      role: 'user',
-      status: 'active',
-      credits: 30,
-      avatar: 'https://randomuser.me/api/portraits/men/42.jpg',
-      joinedDate: '2023-02-20'
-    },
-    {
-      id: 3,
-      name: 'Emma Wilson',
-      email: 'emma@example.com',
-      role: 'user',
-      status: 'active',
-      credits: 15,
-      avatar: 'https://randomuser.me/api/portraits/women/65.jpg',
-      joinedDate: '2023-03-10'
-    },
-    {
-      id: 4,
-      name: 'John Smith',
-      email: 'john@example.com',
-      role: 'admin',
-      status: 'active',
-      credits: 0,
-      avatar: 'https://randomuser.me/api/portraits/men/67.jpg',
-      joinedDate: '2023-01-05'
-    },
-    {
-      id: 5,
-      name: 'David Brown',
-      email: 'david@example.com',
-      role: 'user',
-      status: 'inactive',
-      credits: 5,
-      avatar: 'https://randomuser.me/api/portraits/men/22.jpg',
-      joinedDate: '2023-04-15'
-    }
-  ]);
+  // State for users
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // State for modals
   const [userModalOpen, setUserModalOpen] = useState(false);
@@ -664,28 +640,64 @@ const UserManagement = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [activeRole, setActiveRole] = useState('all');
 
+  // State for alerts/notifications
+  const [alert, setAlert] = useState(null);
+
   // Filter users by role
   const filteredUsers = activeRole === 'all' 
     ? users 
     : users.filter(user => user.role === activeRole);
 
-  // In a real app, you would fetch data from your API here
+  // Fetch users from MongoDB database
   useEffect(() => {
-    // Mock API fetch
     const fetchUsers = async () => {
       try {
-        // const response = await axios.get('/api/admin/users');
-        // setUsers(response.data);
+        setLoading(true);
         
-        // For demo, we're using the mock data already set in state
-        console.log('User data would be fetched here in a real app');
+        // Use the MongoDB endpoint
+        const response = await axios.get('http://localhost:5000/api/mongodb/users');
+        
+        // Log the full response for debugging
+        console.log('MongoDB Response:', response);
+        
+        // Handle the MongoDB response format
+        const userData = response.data || [];
+        console.log('User data from MongoDB:', userData);
+        console.log('Number of users fetched:', userData.length);
+        
+        // Transform the data to match the expected format
+        const formattedUsers = Array.isArray(userData) ? userData.map(user => ({
+          id: user._id,
+          name: user.name || 'Unknown',
+          email: user.email || '',
+          role: user.role || 'user',
+          status: user.status || 'active',
+          credits: user.credits || 0,
+          avatar: user.avatar ? `/uploads/avatars/${user.avatar}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}`,
+          joinedDate: user.createdAt ? new Date(user.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
+        })) : [];
+        
+        console.log('Formatted users for display:', formattedUsers);
+        setUsers(formattedUsers);
+        setLoading(false);
       } catch (error) {
-        console.error('Error fetching users:', error);
+        console.error('Error fetching users from MongoDB:', error);
+        
+        setError('Failed to load users from database. Please check server connection.');
+        setLoading(false);
       }
     };
 
     fetchUsers();
   }, []);
+
+  // Function to set an alert and auto-dismiss after 5 seconds
+  const showAlert = (type, message) => {
+    setAlert({ type, message });
+    setTimeout(() => {
+      setAlert(null);
+    }, 5000);
+  };
 
   // Handle user operations
   const handleAddUser = () => {
@@ -698,29 +710,62 @@ const UserManagement = () => {
     setUserModalOpen(true);
   };
 
-  const handleSaveUser = (userData) => {
-    if (currentUser) {
-      // Edit existing user
-      setUsers(users.map(user => 
-        user.id === currentUser.id ? { ...user, ...userData } : user
-      ));
-    } else {
-      // Add new user
-      setUsers([
-        ...users,
-        {
-          id: users.length + 1,
-          ...userData,
-          joinedDate: new Date().toISOString().split('T')[0]
-        }
-      ]);
+  const handleSaveUser = async (userData) => {
+    try {
+      if (currentUser) {
+        // Edit existing user - use the MongoDB endpoint
+        console.log('Updating user:', currentUser.id, userData);
+        await axios.put(`http://localhost:5000/api/mongodb/users/${currentUser.id}`, userData);
+        
+        // Update state
+        setUsers(users.map(user => 
+          user.id === currentUser.id ? { ...user, ...userData } : user
+        ));
+        showAlert('success', `User ${userData.name} updated successfully`);
+      } else {
+        // Add new user - use the MongoDB endpoint
+        console.log('Adding new user:', userData);
+        const response = await axios.post('http://localhost:5000/api/mongodb/users', userData);
+        
+        // Update state with the newly created user
+        const newUser = response.data;
+        setUsers([
+          ...users,
+          {
+            id: newUser._id,
+            name: newUser.name || 'Unknown',
+            email: newUser.email || '',
+            role: newUser.role || 'user',
+            status: newUser.status || 'active',
+            credits: newUser.credits || 0,
+            avatar: newUser.avatar ? `/uploads/avatars/${newUser.avatar}` : `https://ui-avatars.com/api/?name=${encodeURIComponent(newUser.name || 'User')}`,
+            joinedDate: newUser.createdAt ? new Date(newUser.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
+          }
+        ]);
+        showAlert('success', `User ${userData.name} added successfully`);
+      }
+      setUserModalOpen(false);
+    } catch (error) {
+      console.error('Error saving user:', error);
+      showAlert('error', `Error ${currentUser ? 'updating' : 'adding'} user: ${error.message}`);
     }
-    setUserModalOpen(false);
   };
 
-  const handleDeleteUser = (userId) => {
-    setUsers(users.filter(user => user.id !== userId));
-    setDeleteModalOpen(false);
+  const handleDeleteUser = async (userId) => {
+    try {
+      // Delete user from the API using the MongoDB endpoint
+      console.log('Deleting user:', userId);
+      await axios.delete(`http://localhost:5000/api/mongodb/users/${userId}`);
+      
+      // Update state
+      const userToDelete = users.find(u => u.id === userId);
+      setUsers(users.filter(user => user.id !== userId));
+      setDeleteModalOpen(false);
+      showAlert('success', `User ${userToDelete?.name || userId} deleted successfully`);
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      showAlert('error', `Error deleting user: ${error.message}`);
+    }
   };
 
   const handleManageCredits = (user) => {
@@ -728,17 +773,32 @@ const UserManagement = () => {
     setCreditModalOpen(true);
   };
 
-  const handleSaveCredits = ({ userId, credits, operation }) => {
-    setUsers(users.map(user => {
-      if (user.id === userId) {
-        const newCredits = operation === 'add' 
-          ? user.credits + credits 
-          : Math.max(0, user.credits - credits);
-        return { ...user, credits: newCredits };
-      }
-      return user;
-    }));
-    setCreditModalOpen(false);
+  const handleSaveCredits = async ({ userId, credits, operation }) => {
+    try {
+      // Calculate new credit balance
+      const user = users.find(u => u.id === userId);
+      const newCredits = operation === 'add' 
+        ? user.credits + credits 
+        : Math.max(0, user.credits - credits);
+      
+      // Update user credits using the MongoDB endpoint
+      console.log('Updating credits for user:', userId, 'New credits:', newCredits);
+      await axios.put(`http://localhost:5000/api/mongodb/users/${userId}/credits`, { credits: newCredits });
+      
+      // Update state
+      setUsers(users.map(user => {
+        if (user.id === userId) {
+          return { ...user, credits: newCredits };
+        }
+        return user;
+      }));
+      
+      setCreditModalOpen(false);
+      showAlert('success', `Credits ${operation === 'add' ? 'added to' : 'removed from'} ${user.name}`);
+    } catch (error) {
+      console.error('Error updating credits:', error);
+      showAlert('error', `Error updating credits: ${error.message}`);
+    }
   };
 
   const handleChangeRole = (user) => {
@@ -746,16 +806,68 @@ const UserManagement = () => {
     setRoleModalOpen(true);
   };
 
-  const handleSaveRole = ({ userId, role }) => {
-    setUsers(users.map(user => 
-      user.id === userId ? { ...user, role } : user
-    ));
-    setRoleModalOpen(false);
+  const handleSaveRole = async ({ userId, role }) => {
+    try {
+      // Update user role using the MongoDB endpoint
+      console.log('Updating role for user:', userId, 'New role:', role);
+      await axios.put(`http://localhost:5000/api/mongodb/users/${userId}/role`, { role });
+      
+      // Update state
+      const user = users.find(u => u.id === userId);
+      setUsers(users.map(user => 
+        user.id === userId ? { ...user, role } : user
+      ));
+      
+      setRoleModalOpen(false);
+      showAlert('success', `Role updated for ${user?.name || userId}`);
+    } catch (error) {
+      console.error('Error updating role:', error);
+      showAlert('error', `Error updating role: ${error.message}`);
+    }
   };
+
+  if (loading) {
+    return (
+      <AdminLayout>
+        <div className="flex justify-center items-center h-64">
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary-600"></div>
+            <p className="mt-2 text-gray-600">Loading users...</p>
+          </div>
+        </div>
+      </AdminLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <AdminLayout>
+        <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+          <div className="flex">
+            <div className="flex-shrink-0">
+              <svg className="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 001.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <div className="ml-3">
+              <p className="text-sm text-red-700">{error}</p>
+            </div>
+          </div>
+        </div>
+      </AdminLayout>
+    );
+  }
 
   return (
     <AdminLayout>
       <div className="mb-6">
+        {alert && (
+          <Alert 
+            type={alert.type} 
+            message={alert.message} 
+            onClose={() => setAlert(null)} 
+          />
+        )}
         <h1 className="text-2xl font-bold text-gray-800">User Management</h1>
         <p className="text-gray-600">Manage all users and instructors on the platform</p>
       </div>
