@@ -52,16 +52,21 @@ app.use(cookieParser());
 
 // Enable CORS
 app.use(cors({
-  origin: [
-    'http://localhost:3000', 
-    'http://127.0.0.1:3000',
-    'https://benevolent-muffin-267336.netlify.app',
-    'https://*.netlify.app'  // Allow all Netlify subdomains
-  ],
+  origin: '*',  // Allow all origins during testing
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Add a simple health check route
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'success', 
+    message: 'Server is running',
+    timestamp: new Date(),
+    env: process.env.NODE_ENV
+  });
+});
 
 // Import routes
 const authRoutes = require('./routes/auth');

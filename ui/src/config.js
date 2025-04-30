@@ -2,9 +2,10 @@
 
 const config = {
   // API URLs
-  apiUrl: process.env.NODE_ENV === 'production' 
-    ? 'https://sby-app.onrender.com/api' // Updated with actual Render URL
-    : 'http://localhost:5000/api',
+  apiUrl: process.env.REACT_APP_API_URL || 
+         (process.env.NODE_ENV === 'production' 
+           ? 'https://sby-app.onrender.com/api'
+           : 'http://localhost:5000/api'),
   
   // MongoDB direct access URLs
   mongoDbUrl: process.env.NODE_ENV === 'production'

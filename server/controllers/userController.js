@@ -49,6 +49,27 @@ exports.getUsers = asyncHandler(async (req, res, next) => {
   res.status(200).json(res.advancedResults);
 });
 
+// @desc    Get all instructors
+// @route   GET /api/users/instructors
+// @access  Private
+exports.getInstructors = asyncHandler(async (req, res, next) => {
+  console.log('getInstructors endpoint called');
+  try {
+    const instructors = await User.find({ role: 'instructor' }).select('name email bio avatar');
+    
+    console.log(`Found ${instructors.length} instructors`);
+    
+    res.status(200).json({
+      success: true,
+      count: instructors.length,
+      data: instructors
+    });
+  } catch (error) {
+    console.error('Error in getInstructors:', error);
+    return next(new ErrorResponse('Error fetching instructors', 500));
+  }
+});
+
 // @desc    Get single user
 // @route   GET /api/users/:id
 // @access  Private/Admin

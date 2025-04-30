@@ -7,6 +7,7 @@ const {
   updatePassword,
   getUserClasses,
   getInstructorClasses,
+  getInstructors
 } = require('../controllers/userController');
 const { protect, authorize } = require('../middleware/auth');
 const mongoose = require('mongoose');
@@ -30,6 +31,10 @@ router.get('/mongodb-users', async (req, res) => {
     });
   }
 });
+
+// Get all instructors route - this needs to be before any ID routes
+router.route('/instructors')
+  .get(protect, getInstructors);
 
 // Protected User routes below
 router.route('/')

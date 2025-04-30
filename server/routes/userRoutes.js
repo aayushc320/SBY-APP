@@ -8,7 +8,8 @@ const {
   uploadAvatar,
   removeAvatar,
   getNotificationSettings,
-  updateNotificationSettings
+  updateNotificationSettings,
+  getInstructors
 } = require('../controllers/userController');
 
 const User = require('../models/User');
@@ -26,6 +27,9 @@ router.route('/remove-avatar').delete(removeAvatar);
 router.route('/notification-settings')
   .get(getNotificationSettings)
   .put(updateNotificationSettings);
+
+// Get instructors - available to all authenticated users
+router.route('/instructors').get(getInstructors);
 
 // Admin only routes
 router.use(authorize('admin'));

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
+import api from '../../utils/api';
 
 // Class table component
 const ClassTable = ({ classes, onEdit, onDelete, onView }) => {
@@ -949,13 +950,6 @@ const mockClassesData = [
   }
 ];
 
-const mockInstructorsData = [
-  { id: 1, name: 'Sarah Johnson', role: 'instructor' },
-  { id: 2, name: 'Michael Chen', role: 'instructor' },
-  { id: 3, name: 'Emma Wilson', role: 'instructor' },
-  { id: 4, name: 'John Smith', role: 'instructor' }
-];
-
 const ClassManagement = () => {
   const [classes, setClasses] = useState([]);
   const [instructors, setInstructors] = useState([]);
@@ -1015,14 +1009,42 @@ const ClassManagement = () => {
     };
     
     const fetchInstructors = async () => {
+      console.log('Fetching instructors...');
       try {
-        // In a real app, this would be an API call
-        // const response = await axios.get('/api/admin/instructors');
-        setInstructors(mockInstructorsData); // Use the setInstructors to avoid ESLint error
-        // setIsLoading(false);
+        // Fetch instructors from the API using our api utility with authentication
+        // The api utility already includes the /api prefix in its baseURL
+        const response = await api.get('/users/instructors');
+        console.log('Instructors API response:', response.data);
+        
+        if (response.data.success) {
+          // Transform the data to match the expected format
+          const formattedInstructors = response.data.data.map(instructor => ({
+            id: instructor._id,
+            name: instructor.name,
+            role: 'instructor'
+          }));
+          console.log('Formatted instructors:', formattedInstructors);
+          setInstructors(formattedInstructors);
+        } else {
+          console.error('Error fetching instructors:', response.data.message);
+          // Set a default instructor as fallback
+          setInstructors([{ id: 'default', name: 'Default Instructor', role: 'instructor' }]);
+        }
       } catch (error) {
         console.error('Error fetching instructors data:', error);
-        // setIsLoading(false);
+        // Log detailed error information
+        if (error.response) {
+          console.error('Error response data:', error.response.data);
+          console.error('Error response status:', error.response.status);
+          console.error('Error response headers:', error.response.headers);
+        } else if (error.request) {
+          console.error('No response received:', error.request);
+        } else {
+          console.error('Error message:', error.message);
+        }
+        
+        // Set a default instructor as fallback
+        setInstructors([{ id: 'default', name: 'Default Instructor', role: 'instructor' }]);
       }
     };
 
